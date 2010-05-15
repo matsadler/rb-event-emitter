@@ -87,4 +87,40 @@ class TestEventEmitter < Test::Unit::TestCase
     assert_equal(0, e.listeners(:foo).length)
   end
   
+  # /test/simple/test-event-emitter-remove-listeners.js
+  def test_event_emitter_remove_listeners
+    count = 0
+    
+    listener1 = Proc.new do
+      puts("listener1")
+      count +=1
+    end
+    
+    listener2 = Proc.new do
+      puts("listener2")
+      count +=1
+    end
+    
+    listener3 = Proc.new do
+      puts("listener3")
+      count +=1
+    end
+    
+    e1 = Events::EventEmitter.new
+    e1.add_listener(:hello, &listener1)
+    e1.remove_listener(:hello, listener1)
+    assert_equal([], e1.listeners(:hello))
+    
+    e2 = Events::EventEmitter.new
+    e2.add_listener(:hello, &listener1)
+    e2.remove_listener(:hello, listener2)
+    assert_equal([listener1], e2.listeners(:hello))
+    
+    e3 = Events::EventEmitter.new
+    e3.add_listener(:hello, &listener1)
+    e3.add_listener(:hello, &listener2)
+    e3.remove_listener(:hello, listener1)
+    assert_equal([listener2], e3.listeners(:hello))
+  end
+  
 end
