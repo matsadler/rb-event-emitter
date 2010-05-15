@@ -40,6 +40,7 @@ class TestEventEmitter < Test::Unit::TestCase
     @callback1 = Proc.new do
       callbacks_called.push(:callback1)
       e.add_listener(:foo, &@callback2)
+      e.add_listener(:foo, &@callback3)
       e.remove_listener(:foo, @callback1)
     end
     
@@ -48,20 +49,42 @@ class TestEventEmitter < Test::Unit::TestCase
       e.remove_listener(:foo, @callback2)
     end
     
+    @callback3 = Proc.new do
+      callbacks_called.push(:callback3)
+      e.remove_listener(:foo, @callback3)
+    end
+    
     e.add_listener(:foo, &@callback1)
     assert_equal(1, e.listeners(:foo).length)
     
     e.emit(:foo)
-    assert_equal(1, e.listeners(:foo).length)
+    assert_equal(2, e.listeners(:foo).length)
     assert_equal([:callback1], callbacks_called)
     
     e.emit(:foo)
     assert_equal(0, e.listeners(:foo).length)
-    assert_equal([:callback1, :callback2], callbacks_called)
+    assert_equal([:callback1, :callback2, :callback3], callbacks_called)
     
     e.emit(:foo)
     assert_equal(0, e.listeners(:foo).length)
-    assert_equal([:callback1, :callback2], callbacks_called)
+    assert_equal([:callback1, :callback2, :callback3], callbacks_called)
+    
+    e.add_listener(:foo, &@callback1)
+    e.add_listener(:foo, &@callback2)
+    assert_equal(2, e.listeners(:foo).length)
+    e.remove_all_listeners(:foo)
+    assert_equal(0, e.listeners(:foo).length)
+    
+    # Verify that removing callbacks while in emit allows emits to propagate to
+    # all listeners
+    callbacks_called = []
+    
+    e.add_listener(:foo, &@callback2)
+    e.add_listener(:foo, &@callback3)
+    assert_equal(2, e.listeners(:foo).length)
+    e.emit(:foo)
+    assert_equal([:callback2, :callback3], callbacks_called)
+    assert_equal(0, e.listeners(:foo).length)
   end
   
 end

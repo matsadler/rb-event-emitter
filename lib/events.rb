@@ -39,7 +39,9 @@ module Events # :nodoc:
     # Execute each of the listeners in order with the supplied arguments.
     # 
     def emit(event, *args)
-      listeners(event).each do |listener|
+      listeners = listeners(event).dup
+      
+      listeners.each do |listener|
         listener.call(*args)
       end.any?
     end
