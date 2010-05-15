@@ -67,6 +67,15 @@ module Events # :nodoc:
       listeners(event).delete(proc)
       self
     end
+    
+    # :call-seq: emitter.remove_all_listeners(event) -> emitter
+    # 
+    # Removes all listeners from the listener array for the specified event.
+    # 
+    def remove_all_listeners(event)
+      listeners(event).clear
+      self
+    end
   end
   
   # The Events::EventEmitter class provides a clone of the Node.js EventEmitter
