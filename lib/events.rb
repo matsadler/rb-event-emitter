@@ -1,4 +1,5 @@
 module Events # :nodoc:
+  UncaughtError = Class.new(StandardError)
   
   # The Events::Emitter mixin provides a clone of the Node.js EventEmitter API
   # for Ruby.
@@ -23,6 +24,10 @@ module Events # :nodoc:
   # Outputs "added new listener #<Proc:0x0000000000000000@example.rb:12> for
   # event connection".
   # 
+  # When an EventEmitter experiences an error, the typical action is to emit an
+  # :error event. Error events are special -- if there is no handler for them
+  # they raise an Events::UncaughtError exception.
+  # 
   module Emitter
     
     # :call-seq: emitter.listeners(event) -> array
@@ -40,6 +45,11 @@ module Events # :nodoc:
     # 
     def emit(event, *args)
       listeners = listeners(event).dup
+      
+      if event == :error && listeners.empty?
+        raise args.first if args.first.kind_of?(Exception)
+        raise Events::UncaughtError.new("Uncaught, unspecified 'error' event.")
+      end
       
       listeners.each do |listener|
         listener.call(*args)
