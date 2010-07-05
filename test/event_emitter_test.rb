@@ -16,7 +16,7 @@ class TestEventEmitter < Test::Unit::TestCase
       events_new_listener_emited.push(event)
     end
     
-    e.add_listener(:hello) do |a, b|
+    e.on(:hello) do |a, b|
       puts "hello"
       times_hello_emited += 1
       assert_equal("a", a)

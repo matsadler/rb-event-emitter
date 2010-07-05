@@ -60,8 +60,8 @@ end
 
 server = TCPServer.new("localhost", 7000)
 
-server.add_listener(:connection) do |connection|
-  connection.add_listener(:data) do |data|
+server.on(:connection) do |connection|
+  connection.on(:data) do |data|
     connection.write(data)
   end
 end

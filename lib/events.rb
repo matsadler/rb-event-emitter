@@ -14,11 +14,11 @@ module Events # :nodoc:
   # All EventEmitters emit the event :new_listener when new listeners are added,
   # this listener is provided with the event and new listener added.
   # Example:
-  #   server.add_listener(:new_listener) do |event, listener|
+  #   server.on(:new_listener) do |event, listener|
   #     puts "added new listener #{listener} for event #{event}"
   #   end
   #   
-  #   server.add_listener(:connection) do |socket|
+  #   server.on(:connection) do |socket|
   #     puts "someone connected!"
   #   end
   # Outputs "added new listener #<Proc:0x0000000000000000@example.rb:12> for
@@ -56,10 +56,10 @@ module Events # :nodoc:
       end.any?
     end
     
-    # :call-seq: emitter.add_listener(event, &block) -> emitter
+    # :call-seq: emitter.on(event, &block) -> emitter
     # 
     # Adds a listener to the end of the listeners array for the specified event.
-    #   server.add_listener(:connection) do |socket|
+    #   server.on(:connection) do |socket|
     #     puts "someone connected!"
     #   end
     # 
@@ -68,6 +68,7 @@ module Events # :nodoc:
       listeners(event).push(block)
       self
     end
+    alias on add_listener
     
     # :call-seq: emitter.remove_listener(event, proc) -> emitter
     # 
