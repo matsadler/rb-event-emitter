@@ -56,15 +56,19 @@ module Events # :nodoc:
       end.any?
     end
     
-    # :call-seq: emitter.on(event, &block) -> emitter
+    # :call-seq: emitter.on(event) {|args...| block} -> emitter
+    # emitter.on(event, proc) -> emitter
     # 
     # Adds a listener to the end of the listeners array for the specified event.
     #   server.on(:connection) do |socket|
     #     puts "someone connected!"
     #   end
     # 
-    def add_listener(event, &block)
-      emit(:new_listener, event, block)
+    # Rather than a block, can take a second argument of a Proc (or any object
+    # with a #call method).
+    # 
+    def add_listener(event, proc=nil, &block)
+      emit(:new_listener, event, proc || block)
       listeners(event).push(block)
       self
     end
