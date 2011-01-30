@@ -69,7 +69,7 @@ module Events # :nodoc:
     # 
     def add_listener(event, proc=nil, &block)
       emit(:new_listener, event, proc || block)
-      listeners(event).push(block)
+      listeners(event).push(proc || block)
       self
     end
     alias on add_listener
