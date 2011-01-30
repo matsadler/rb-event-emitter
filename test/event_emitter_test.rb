@@ -140,4 +140,27 @@ class TestEventEmitter < Test::Unit::TestCase
     assert_equal(1, times_hello_emited)
   end
   
+  # /test/simple/test-event-emitter-num-args.js
+  def test_event_emitter_num_args
+    e = Events::EventEmitter.new
+    num_args_emited = []
+    
+    e.on(:num_args) do |*args|
+      num_args = args.length
+      puts "num_args: #{num_args}"
+      num_args_emited.push(num_args)
+    end
+    
+    puts "start"
+    
+    e.emit(:num_args)
+    e.emit(:num_args, nil)
+    e.emit(:num_args, nil, nil)
+    e.emit(:num_args, nil, nil, nil)
+    e.emit(:num_args, nil, nil, nil, nil)
+    e.emit(:num_args, nil, nil, nil, nil, nil)
+    
+    assert_equal([0, 1, 2, 3, 4, 5], num_args_emited)
+  end
+  
 end
