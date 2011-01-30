@@ -1,6 +1,19 @@
 module Events # :nodoc:
   UncaughtError = Class.new(StandardError)
   
+  class OnceProxy # :nodoc:
+    attr_reader :event, :caller, :delegate
+    
+    def initialize(event, caller, delegate)
+      @event, @caller, @delegate = event, caller, delegate
+    end
+    
+    def call(*args)
+      caller.remove_listener(event, self)
+      delegate.call(*args)
+    end
+  end
+  
   # The Events::Emitter mixin provides a clone of the Node.js EventEmitter API
   # for Ruby.
   # 
@@ -73,6 +86,20 @@ module Events # :nodoc:
       self
     end
     alias on add_listener
+    
+    
+    # :call-seq: emitter.once(event) {|args...| block} -> emitter
+    # emitter.once(event, proc) -> emitter
+    # 
+    # Adds a one time listener for the event. The listener is invoked only the
+    # first time the event is fired, after which it is removed.
+    #   server.once(:connection) do |socket|
+    #     puts "Ah, we have our first user!"
+    #   end
+    # 
+    def once(event, proc=nil, &block)
+      add_listener(event, OnceProxy.new(event, self, proc || block))
+    end
     
     # :call-seq: emitter.remove_listener(event, proc) -> emitter
     # 

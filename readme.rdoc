@@ -37,6 +37,14 @@ Adds a listener to the end of the listeners array for the specified event.
     puts "someone connected!"
   end
 
+  emitter.once(event, &block)
+
+Adds a one time listener for the event. The listener is invoked only the
+first time the event is fired, after which it is removed.
+  server.once(:connection) do |socket|
+    puts "Ah, we have our first user!"
+  end
+
   emitter.remove_listener(event, proc)
 
 Remove a listener from the listener array for the specified event.

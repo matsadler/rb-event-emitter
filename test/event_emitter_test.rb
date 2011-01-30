@@ -123,4 +123,21 @@ class TestEventEmitter < Test::Unit::TestCase
     assert_equal([listener2], e3.listeners(:hello))
   end
   
+  # /test/simple/test-event-emitter-once.js
+  def test_event_emitter_once
+    e = Events::EventEmitter.new
+    times_hello_emited = 0
+    
+    e.once(:hello) do |a, b|
+      times_hello_emited += 1
+    end
+    
+    e.emit(:hello, "a", "b")
+    e.emit(:hello, "a", "b")
+    e.emit(:hello, "a", "b")
+    e.emit(:hello, "a", "b")
+    
+    assert_equal(1, times_hello_emited)
+  end
+  
 end
