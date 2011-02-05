@@ -97,11 +97,15 @@ module Events # :nodoc:
       event_listeners = listeners(event)
       
       current = event_listeners.length
-      if max_listeners && max_listeners > 0 && current > max_listeners
+      if max_listeners && max_listeners > 0 && current > max_listeners &&
+        (!event_listeners.respond_to?(:warned?) || !event_listeners.warned?)
         warn(caller[1] +
           ": warning: possible EventEmitter memory leak detected. " <<
           "#{current} listeners added. " <<
           "Use Emitter#max_listeners = n to increase limit.")
+        def event_listeners.warned?
+          true
+        end
       end
       
       event_listeners.push(listener)
