@@ -76,7 +76,6 @@ module Events # :nodoc:
     end
     alias on add_listener
     
-    
     # :call-seq: emitter.once(event) {|args...| block} -> emitter
     # emitter.once(event, proc) -> emitter
     # 
