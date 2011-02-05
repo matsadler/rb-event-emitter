@@ -44,16 +44,18 @@ module Events # :nodoc:
     # Execute each of the listeners in order with the supplied arguments.
     # 
     def emit(event, *args)
-      listeners = listeners(event).dup
+      listeners = @listeners && @listeners.key?(event) && @listeners[event]
       
-      if event == :error && listeners.empty?
+      if event == :error && (!listeners || listeners.empty?)
         raise args.first if args.first.kind_of?(Exception)
         raise Events::UncaughtError.new("Uncaught, unspecified 'error' event.")
+      elsif listeners
+        listeners.dup.each do |listener|
+          listener.call(*args)
+        end.any?
+      else
+        false
       end
-      
-      listeners.each do |listener|
-        listener.call(*args)
-      end.any?
     end
     
     # :call-seq: emitter.on(event) {|args...| block} -> emitter
