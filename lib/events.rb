@@ -29,6 +29,24 @@ module Events # :nodoc:
   # they raise an Events::UncaughtError exception.
   # 
   module Emitter
+    DEFAULT_MAX_LISTENERS = 10
+    
+    def max_listeners
+      @max_listeners || DEFAULT_MAX_LISTENERS
+    end
+    private :max_listeners
+    
+    # :call-seq: emitter.max_listeners = integer -> integer
+    #
+    # By default an EventEmitter will print a warning if more than 10 listeners
+    # are added to it. This is a useful default which helps finding memory
+    # leaks. Obviously not all Emitters should be limited to 10. This method
+    # allows that to be increased. Set to zero for unlimited.
+    # 
+    def max_listeners=(value)
+      @max_listeners = value
+    end
+    alias set_max_listeners max_listeners=
     
     # :call-seq: emitter.listeners(event) -> array
     # 
@@ -75,7 +93,18 @@ module Events # :nodoc:
         raise ArgumentError.new("Listener must respond to #call")
       end
       emit(:new_listener, event, listener)
-      listeners(event).push(listener)
+      
+      event_listeners = listeners(event)
+      
+      current = event_listeners.length
+      if max_listeners && max_listeners > 0 && current > max_listeners
+        warn(caller[1] +
+          ": warning: possible EventEmitter memory leak detected. " <<
+          "#{current} listeners added. " <<
+          "Use Emitter#max_listeners = n to increase limit.")
+      end
+      
+      event_listeners.push(listener)
       self
     end
     alias on add_listener
