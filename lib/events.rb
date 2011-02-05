@@ -97,7 +97,10 @@ module Events # :nodoc:
     # Remove a listener from the listener array for the specified event.
     # 
     def remove_listener(event, proc)
-      listeners(event).delete(proc)
+      if @listeners && @listeners.key?(event)
+        @listeners[event].delete(proc)
+        @listeners.delete(event) if @listeners[event].empty?
+      end
       self
     end
     
@@ -106,7 +109,10 @@ module Events # :nodoc:
     # Removes all listeners from the listener array for the specified event.
     # 
     def remove_all_listeners(event)
-      listeners(event).clear
+      if @listeners && @listeners.key?(event)
+        @listeners[event].clear
+        @listeners.delete(event)
+      end
       self
     end
   end
