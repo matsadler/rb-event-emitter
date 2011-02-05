@@ -70,8 +70,12 @@ module Events # :nodoc:
     # with a #call method).
     # 
     def add_listener(event, proc=nil, &block)
-      emit(:new_listener, event, proc || block)
-      listeners(event).push(proc || block)
+      listener = proc || block
+      unless listener.respond_to?(:call)
+        raise ArgumentError.new("Listener must respond to #call")
+      end
+      emit(:new_listener, event, listener)
+      listeners(event).push(listener)
       self
     end
     alias on add_listener
