@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "events"
-  s.version = "0.9.3"
+  s.version = "0.9.4"
   s.summary = "Clone of the node.js EventEmitter api for Ruby"
   s.description = "The Events::Emitter mixin provides a clone of the Node.js EventEmitter API for Ruby."
   s.files = Dir["lib/**/*.rb"] + Dir["test/*.*"]
