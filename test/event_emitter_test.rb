@@ -27,6 +27,11 @@ class TestEventEmitter < Test::Unit::TestCase
     
     e.emit(:hello, "a", "b")
     
+    
+    # just make sure that this doesn't raise:
+    f = Events::EventEmitter.new
+    assert_nothing_raised {f.max_listeners = 0}
+    
     assert_equal([:hello], events_new_listener_emited)
     assert_equal(1, times_hello_emited)
   end
