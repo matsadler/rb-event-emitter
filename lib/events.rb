@@ -123,9 +123,13 @@ module Events # :nodoc:
     #   end
     # 
     def once(event, proc=nil, &block)
+      listener = proc || block
+      unless listener.respond_to?(:call)
+        raise ArgumentError.new("Listener must respond to #call")
+      end
       once = Proc.new do |*args|
         remove_listener(event, once)
-        (proc || block).call(args)
+        listener.call(args)
       end
       add_listener(event, once)
     end
