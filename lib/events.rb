@@ -36,7 +36,7 @@ module Events # :nodoc:
     end
     
     def max_listeners
-      @max_listeners || DEFAULT_MAX_LISTENERS
+      (defined?(@max_listeners) ? @max_listeners : DEFAULT_MAX_LISTENERS) || 0
     end
     private :max_listeners
     
@@ -101,7 +101,7 @@ module Events # :nodoc:
       event_listeners = listeners(event)
       
       current = event_listeners.length
-      if max_listeners && max_listeners > 0 && current > max_listeners &&
+      if max_listeners > 0 && current > max_listeners &&
         (!event_listeners.respond_to?(:warned?) || !event_listeners.warned?)
         warn(caller[1] +
           ": warning: possible EventEmitter memory leak detected. " <<
