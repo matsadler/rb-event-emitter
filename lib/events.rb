@@ -31,6 +31,10 @@ module Events # :nodoc:
   module Emitter
     DEFAULT_MAX_LISTENERS = 10
     
+    class Listeners < Array
+      attr_accessor :warned
+    end
+    
     class OnceWrapper < Proc
       attr_accessor :original
     end
@@ -58,7 +62,7 @@ module Events # :nodoc:
     # manipulated, e.g. to remove listeners.
     # 
     def listeners(event)
-      (@listeners ||= Hash.new {|hash, key| hash[key] = []})[event]
+      (@listeners ||= Hash.new {|hash, key| hash[key] = Listeners.new})[event]
     end
     
     # :call-seq: emitter.emit(event[, arguments...]) -> bool
@@ -101,15 +105,12 @@ module Events # :nodoc:
       event_listeners = listeners(event)
       
       current = event_listeners.length
-      if max_listeners > 0 && current > max_listeners &&
-        (!event_listeners.respond_to?(:warned?) || !event_listeners.warned?)
+      if max_listeners > 0 && current > max_listeners && !event_listeners.warned
         warn(caller[1] +
           ": warning: possible EventEmitter memory leak detected. " <<
           "#{current} listeners added. " <<
           "Use Emitter#max_listeners = n to increase limit.")
-        def event_listeners.warned?
-          true
-        end
+        event_listeners.warned = true
       end
       
       event_listeners.push(listener)
