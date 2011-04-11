@@ -142,6 +142,14 @@ class TestEventEmitter < Test::Unit::TestCase
     e.emit(:hello, "a", "b")
     e.emit(:hello, "a", "b")
     
+    remove = Proc.new do
+      flunk("once->foo should not be emitted")
+    end
+    
+    e.once(:foo, remove)
+    e.remove_listener(:foo, remove)
+    e.emit(:foo)
+    
     assert_equal(1, times_hello_emited)
   end
   

@@ -31,6 +31,10 @@ module Events # :nodoc:
   module Emitter
     DEFAULT_MAX_LISTENERS = 10
     
+    class OnceWrapper < Proc
+      attr_accessor :original
+    end
+    
     def max_listeners
       @max_listeners || DEFAULT_MAX_LISTENERS
     end
@@ -127,10 +131,12 @@ module Events # :nodoc:
       unless listener.respond_to?(:call)
         raise ArgumentError.new("Listener must respond to #call")
       end
-      once = Proc.new do |*args|
+      once = OnceWrapper.new do |*args|
         remove_listener(event, once)
         listener.call(args)
       end
+      once.original = listener
+      
       add_listener(event, once)
     end
     
@@ -140,7 +146,9 @@ module Events # :nodoc:
     # 
     def remove_listener(event, proc)
       if @listeners && @listeners.key?(event)
-        @listeners[event].delete(proc)
+        @listeners[event].delete_if do |lis|
+          lis == proc || lis.respond_to?(:original) && lis.original == proc
+        end
         @listeners.delete(event) if @listeners[event].empty?
       end
       self
