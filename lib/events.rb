@@ -155,11 +155,13 @@ module Events # :nodoc:
       self
     end
     
-    # :call-seq: emitter.remove_all_listeners(event) -> emitter
+    # :call-seq: emitter.remove_all_listeners -> emitter
+    # emitter.remove_all_listeners(event) -> emitter
     # 
-    # Removes all listeners from the listener array for the specified event.
+    # Removes all listeners, or those of the specified event.
     # 
-    def remove_all_listeners(event)
+    def remove_all_listeners(event=:_remove_all_listeners_default_arg_)
+      @listeners = nil if event == :_remove_all_listeners_default_arg_
       if @listeners && @listeners.key?(event)
         @listeners[event].clear
         @listeners.delete(event)

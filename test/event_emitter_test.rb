@@ -1,7 +1,8 @@
 require "test/unit"
 require "../lib/events"
 
-# Tests transliterated from javascript originals at http://github.com/ry/node/
+# Tests transliterated from javascript originals at
+# http://github.com/joyent/node/
 class TestEventEmitter < Test::Unit::TestCase
   
   # /test/simple/test-event-emitter-add-listeners.js
@@ -90,6 +91,25 @@ class TestEventEmitter < Test::Unit::TestCase
     e.emit(:foo)
     assert_equal([:callback2, :callback3], callbacks_called)
     assert_equal(0, e.listeners(:foo).length)
+  end
+  
+  # /test/simple/test-event-emitter-remove-all-listeners.js
+  def test_event_emitter_remove_all_listeners
+    listener = Proc.new {}
+    
+    e1 = Events::EventEmitter.new
+    e1.add_listener(:foo, &listener)
+    e1.add_listener(:bar, &listener)
+    e1.remove_all_listeners(:foo)
+    assert_equal([], e1.listeners(:foo))
+    assert_equal([listener], e1.listeners(:bar))
+    
+    e2 = Events::EventEmitter.new
+    e2.add_listener(:foo, &listener)
+    e2.add_listener(:bar, &listener)
+    e2.remove_all_listeners
+    assert_equal([], e2.listeners(:foo))
+    assert_equal([], e2.listeners(:bar))
   end
   
   # /test/simple/test-event-emitter-remove-listeners.js
