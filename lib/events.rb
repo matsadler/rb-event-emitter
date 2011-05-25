@@ -103,6 +103,7 @@ module Events # :nodoc:
       emit(:new_listener, event, listener)
       
       event_listeners = listeners(event)
+      event_listeners.push(listener)
       
       current = event_listeners.length
       if max_listeners > 0 && current > max_listeners && !event_listeners.warned
@@ -113,7 +114,6 @@ module Events # :nodoc:
         event_listeners.warned = true
       end
       
-      event_listeners.push(listener)
       self
     end
     alias on add_listener

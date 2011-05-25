@@ -37,6 +37,35 @@ class TestEventEmitter < Test::Unit::TestCase
     assert_equal(1, times_hello_emited)
   end
   
+  # /test/simple/test-event-emitter-check-listener-leaks.js
+  def test_event_emitter_check_listener_leaks
+    e = Events::EventEmitter.new
+    
+    # default
+    10.times do
+      e.on(:default) {}
+    end
+    assert(!e.listeners(:default).warned)
+    e.on(:default) {}
+    assert(e.listeners(:default).warned)
+    
+    # specific
+    e.max_listeners = 5
+    5.times do
+      e.on(:specific) {}
+    end
+    assert(!e.listeners(:specific).warned)
+    e.on(:specific) {}
+    assert(e.listeners(:specific).warned)
+    
+    # unlimited
+    e.max_listeners = 0
+    1000.times do
+      e.on(:unlimited) {}
+    end
+    assert(!e.listeners(:unlimited).warned)
+  end
+  
   # /test/simple/test-event-emitter-modify-in-emit.js
   def test_event_emitter_modify_in_emit
     callbacks_called = []
