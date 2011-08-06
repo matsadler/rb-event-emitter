@@ -122,6 +122,54 @@ class TestEventEmitter < Test::Unit::TestCase
     assert_equal(0, e.listeners(:foo).length)
   end
   
+  # /test/simple/test-event-emitter-num-args.js
+  def test_event_emitter_num_args
+    e = Events::EventEmitter.new
+    num_args_emited = []
+    
+    e.on(:num_args) do |*args|
+      num_args = args.length
+      puts "num_args: #{num_args}"
+      num_args_emited.push(num_args)
+    end
+    
+    puts "start"
+    
+    e.emit(:num_args)
+    e.emit(:num_args, nil)
+    e.emit(:num_args, nil, nil)
+    e.emit(:num_args, nil, nil, nil)
+    e.emit(:num_args, nil, nil, nil, nil)
+    e.emit(:num_args, nil, nil, nil, nil, nil)
+    
+    assert_equal([0, 1, 2, 3, 4, 5], num_args_emited)
+  end
+  
+  # /test/simple/test-event-emitter-once.js
+  def test_event_emitter_once
+    e = Events::EventEmitter.new
+    times_hello_emited = 0
+    
+    e.once(:hello) do |a, b|
+      times_hello_emited += 1
+    end
+    
+    e.emit(:hello, "a", "b")
+    e.emit(:hello, "a", "b")
+    e.emit(:hello, "a", "b")
+    e.emit(:hello, "a", "b")
+    
+    remove = Proc.new do
+      flunk("once->foo should not be emitted")
+    end
+    
+    e.once(:foo, remove)
+    e.remove_listener(:foo, remove)
+    e.emit(:foo)
+    
+    assert_equal(1, times_hello_emited)
+  end
+  
   # /test/simple/test-event-emitter-remove-all-listeners.js
   def test_event_emitter_remove_all_listeners
     listener = Proc.new {}
@@ -175,54 +223,6 @@ class TestEventEmitter < Test::Unit::TestCase
     e3.add_listener(:hello, &listener2)
     e3.remove_listener(:hello, listener1)
     assert_equal([listener2], e3.listeners(:hello))
-  end
-  
-  # /test/simple/test-event-emitter-once.js
-  def test_event_emitter_once
-    e = Events::EventEmitter.new
-    times_hello_emited = 0
-    
-    e.once(:hello) do |a, b|
-      times_hello_emited += 1
-    end
-    
-    e.emit(:hello, "a", "b")
-    e.emit(:hello, "a", "b")
-    e.emit(:hello, "a", "b")
-    e.emit(:hello, "a", "b")
-    
-    remove = Proc.new do
-      flunk("once->foo should not be emitted")
-    end
-    
-    e.once(:foo, remove)
-    e.remove_listener(:foo, remove)
-    e.emit(:foo)
-    
-    assert_equal(1, times_hello_emited)
-  end
-  
-  # /test/simple/test-event-emitter-num-args.js
-  def test_event_emitter_num_args
-    e = Events::EventEmitter.new
-    num_args_emited = []
-    
-    e.on(:num_args) do |*args|
-      num_args = args.length
-      puts "num_args: #{num_args}"
-      num_args_emited.push(num_args)
-    end
-    
-    puts "start"
-    
-    e.emit(:num_args)
-    e.emit(:num_args, nil)
-    e.emit(:num_args, nil, nil)
-    e.emit(:num_args, nil, nil, nil)
-    e.emit(:num_args, nil, nil, nil, nil)
-    e.emit(:num_args, nil, nil, nil, nil, nil)
-    
-    assert_equal([0, 1, 2, 3, 4, 5], num_args_emited)
   end
   
 end

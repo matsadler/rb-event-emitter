@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.summary = "Clone of the node.js EventEmitter api for Ruby"
   s.description = "The Events::Emitter mixin provides a clone of the Node.js EventEmitter API for Ruby."
   s.files = Dir["lib/**/*.rb"] + Dir["test/*.*"]
-  s.test_files = ["test/event_emitter_test.rb"]
+  s.test_files = Dir["test/**/*.rb"]
   s.require_path = "lib"
   s.has_rdoc = true
   s.extra_rdoc_files = ["readme.rdoc"]
