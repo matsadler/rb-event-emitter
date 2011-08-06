@@ -134,7 +134,7 @@ module Events # :nodoc:
       end
       once = OnceWrapper.new do |*args|
         remove_listener(event, once)
-        listener.call(args)
+        listener.call(*args)
       end
       once.original = listener
       
