@@ -4,6 +4,44 @@ require "stringio"
 
 class TestEvents < Test::Unit::TestCase
   
+  def test_emit_error_raises_without_handler
+    emitter = Events::EventEmitter.new
+    
+    assert_raise(Events::UncaughtError) {emitter.emit(:error)}
+    assert_raise(Events::UncaughtError) {emitter.emit(:error, "error")}
+    assert(Events::UncaughtError < RuntimeError, "should be a subclass")
+    assert_raise(StandardError) {emitter.emit(:error, StandardError.new("error"))}
+    assert_raise(StandardError) {emitter.emit(:error, StandardError, "error")}
+  end
+  
+  def test_emit_error_raises_without_handler_with_correct_message
+    emitter = Events::EventEmitter.new
+    
+    begin
+      emitter.emit(:error)
+    rescue => e
+      assert_equal("Uncaught, unspecified 'error' event.", e.message)
+    end
+    
+    begin
+      emitter.emit(:error, "test error message")
+    rescue => e
+      assert_equal("test error message", e.message)
+    end
+    
+    begin
+      emitter.emit(:error, StandardError.new("error test message"))
+    rescue => e
+      assert_equal("error test message", e.message)
+    end
+    
+    begin
+      emitter.emit(:error, StandardError, "message test error")
+    rescue => e
+      assert_equal("message test error", e.message)
+    end
+  end
+  
   def test_any_listener_that_responds_to_call_is_accepted
     emitter = Events::EventEmitter.new
     block_result, proc_result, lambda_result = nil
