@@ -182,9 +182,7 @@ class TestEventEmitter < Test::Unit::TestCase
     e = Events::EventEmitter.new
     times_hello_emited = 0
     
-    e.once(:hello) do |a, b|
-      times_hello_emited += 1
-    end
+    e.once :hello, lambda {|a, b| times_hello_emited += 1}
     
     e.emit(:hello, "a", "b")
     e.emit(:hello, "a", "b")
