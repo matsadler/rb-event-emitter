@@ -1,5 +1,5 @@
 require "test/unit"
-require "../lib/events"
+require File.expand_path("../../lib/events", __FILE__)
 
 # Tests transliterated from javascript originals at
 # http://github.com/joyent/node/
