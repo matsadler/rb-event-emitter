@@ -58,6 +58,13 @@ class TestEventEmitter < Test::Unit::TestCase
     e.on(:specific) {}
     assert(e.listeners(:specific).warned)
     
+    # only one
+    e.max_listeners = 1
+    e.on(:only_one) {}
+    assert(!e.listeners(:only_one).warned)
+    e.on(:only_one) {}
+    assert(e.listeners(:only_one).warned)
+    
     # unlimited
     e.max_listeners = 0
     1000.times do
