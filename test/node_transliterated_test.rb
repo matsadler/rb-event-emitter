@@ -10,19 +10,25 @@ class TestEventEmitter < Test::Unit::TestCase
     e = Events::EventEmitter.new
     
     events_new_listener_emited = []
+    listeners_new_listener_emited = []
     times_hello_emited = 0
     
     e.add_listener(:new_listener) do |event, listener|
       puts "new_listener: #{event}"
       events_new_listener_emited.push(event)
+      listeners_new_listener_emited.push(listener)
     end
     
-    e.on(:hello) do |a, b|
+    hello = Proc.new do |a, b|
       puts "hello"
       times_hello_emited += 1
       assert_equal("a", a)
       assert_equal("b", b)
     end
+    e.on(:hello, hello)
+    
+    foo = Proc.new {}
+    e.once(:foo, foo)
     
     puts "start"
     
@@ -33,7 +39,8 @@ class TestEventEmitter < Test::Unit::TestCase
     f = Events::EventEmitter.new
     assert_nothing_raised {f.max_listeners = 0}
     
-    assert_equal([:hello], events_new_listener_emited)
+    assert_equal([:hello, :foo], events_new_listener_emited)
+    assert_equal([hello, foo], listeners_new_listener_emited)
     assert_equal(1, times_hello_emited)
   end
   

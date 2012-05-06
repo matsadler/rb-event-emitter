@@ -101,7 +101,9 @@ module Events # :nodoc:
       unless listener.respond_to?(:call)
         raise ArgumentError.new("Listener must respond to #call")
       end
-      emit(:new_listener, event, listener)
+      
+      to_emit = OnceWrapper === listener ? listener.original : listener
+      emit(:new_listener, event, to_emit)
       
       event_listeners = listeners(event)
       event_listeners.push(listener)
