@@ -153,7 +153,6 @@ module Events # :nodoc:
         @listeners[event].delete_if do |lis|
           lis == proc || lis.respond_to?(:original) && lis.original == proc
         end
-        @listeners.delete(event) if @listeners[event].empty?
       end
       self
     end
@@ -167,7 +166,6 @@ module Events # :nodoc:
       @listeners = nil if event == :_remove_all_listeners_default_arg_
       if @listeners && @listeners.key?(event)
         @listeners[event].clear
-        @listeners.delete(event)
       end
       self
     end

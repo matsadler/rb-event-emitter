@@ -191,9 +191,14 @@ class TestEventEmitter < Test::Unit::TestCase
     e1 = Events::EventEmitter.new
     e1.add_listener(:foo, &listener)
     e1.add_listener(:bar, &listener)
+    foo_listeners = e1.listeners(:foo)
+    bar_listeners = e1.listeners(:bar)
     e1.remove_all_listeners(:foo)
     assert_equal([], e1.listeners(:foo))
     assert_equal([listener], e1.listeners(:bar))
+    # identity check, the array should not change
+    assert_same(foo_listeners, e1.listeners(:foo))
+    assert_same(bar_listeners, e1.listeners(:bar))
     
     e2 = Events::EventEmitter.new
     e2.add_listener(:foo, &listener)
@@ -223,9 +228,14 @@ class TestEventEmitter < Test::Unit::TestCase
     end
     
     e1 = Events::EventEmitter.new
+    e1_listeners = e1.listeners(:hello)
     e1.add_listener(:hello, &listener1)
+    assert_equal(1, e1_listeners.length)
     e1.remove_listener(:hello, listener1)
     assert_equal([], e1.listeners(:hello))
+    
+    # identity check, listeners array should be the same
+    assert_same(e1_listeners, e1.listeners(:hello))
     
     e2 = Events::EventEmitter.new
     e2.add_listener(:hello, &listener1)
@@ -235,8 +245,13 @@ class TestEventEmitter < Test::Unit::TestCase
     e3 = Events::EventEmitter.new
     e3.add_listener(:hello, &listener1)
     e3.add_listener(:hello, &listener2)
+    e3_listeners = e3.listeners(:hello)
+    assert_equal(2, e3_listeners.length)
     e3.remove_listener(:hello, listener1)
+    assert_equal(1, e3_listeners.length)
     assert_equal([listener2], e3.listeners(:hello))
+    
+    assert_same(e3_listeners, e3.listeners(:hello))
   end
   
 end
